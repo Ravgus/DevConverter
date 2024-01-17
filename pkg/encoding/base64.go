@@ -2,24 +2,21 @@ package encoding
 
 import (
 	"encoding/base64"
-	"fmt"
-	"os"
+	"log"
 )
 
 type Base64Encoder struct{}
 
-func (Base64Encoder) Encode(input string) string {
-	return base64.StdEncoding.EncodeToString([]byte(input))
+func (Base64Encoder) Encode(data string) string {
+	return base64.StdEncoding.EncodeToString([]byte(data))
 }
 
-func (Base64Encoder) Decode(input string) string {
-	data, err := base64.StdEncoding.DecodeString(input)
+func (Base64Encoder) Decode(data string) string {
+	decodeResult, err := base64.StdEncoding.DecodeString(data)
 
 	if err != nil {
-		fmt.Println("Error: ", err)
-
-		os.Exit(-1)
+		log.Fatalf("Error: %v", err)
 	}
 
-	return string(data)
+	return string(decodeResult)
 }
