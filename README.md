@@ -1,1 +1,1 @@
-# DevConverter
+For educational purposes.
