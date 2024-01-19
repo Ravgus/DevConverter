@@ -1,19 +1,21 @@
 package converting
 
-const DECIMAL = "Decimal"
-const BINARY = "Binary"
-const OCTAL = "Octal"
-const HEXADECIMAL = "Hexadecimal"
+const (
+	Decimal     = "Decimal"
+	Binary      = "Binary"
+	Octal       = "Octal"
+	Hexadecimal = "Hexadecimal"
+)
 
 func Build(numberingSystem string) Converter {
 	switch numberingSystem {
-	case DECIMAL:
+	case Decimal:
 		return DecimalConverter{}
-	case BINARY:
+	case Binary:
 		return BinaryConverter{}
-	case OCTAL:
+	case Octal:
 		return OctalConverter{}
-	case HEXADECIMAL:
+	case Hexadecimal:
 		return HexadecimalConverter{}
 	default:
 		return nil

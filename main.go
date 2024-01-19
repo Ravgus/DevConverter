@@ -1,11 +1,12 @@
 package main
 
 import (
-	"DevConverter/pkg/converting"
-	"DevConverter/pkg/encoding"
-	"DevConverter/pkg/hashing"
 	"bufio"
 	"fmt"
+	"github.com/Ravgus/DevConverter/internal/converting"
+	"github.com/Ravgus/DevConverter/internal/encoding"
+	"github.com/Ravgus/DevConverter/internal/hashing"
+	"log"
 	"os"
 	"strings"
 )
@@ -23,8 +24,7 @@ func main() {
 	fmt.Println(Converting)
 	fmt.Print("Enter your choice: ")
 
-	purpose, _ := reader.ReadString('\n')
-	purpose = strings.TrimSpace(purpose)
+	purpose := getInput(reader)
 
 	var result string
 
@@ -46,14 +46,13 @@ func main() {
 
 func executeHashing(reader *bufio.Reader) string {
 	fmt.Println("Chose hash algorithm:")
-	fmt.Println(hashing.MD5)
-	fmt.Println(hashing.SHA1)
-	fmt.Println(hashing.SHA256)
-	fmt.Println(hashing.SHA512)
+	fmt.Println(hashing.Md5)
+	fmt.Println(hashing.Sha1)
+	fmt.Println(hashing.Sha156)
+	fmt.Println(hashing.Sha512)
 	fmt.Print("Enter your choice: ")
 
-	algorithm, _ := reader.ReadString('\n')
-	algorithm = strings.TrimSpace(algorithm)
+	algorithm := getInput(reader)
 
 	hasher := hashing.Build(algorithm)
 
@@ -63,19 +62,17 @@ func executeHashing(reader *bufio.Reader) string {
 
 	fmt.Print("Enter source text: ")
 
-	text, _ := reader.ReadString('\n')
-	text = strings.TrimSpace(text)
+	text := getInput(reader)
 
 	return hasher.Hash(text)
 }
 
 func executeEncoding(reader *bufio.Reader) string {
 	fmt.Println("Chose encoding algorithm: ")
-	fmt.Println(encoding.BASE64)
+	fmt.Println(encoding.Base64)
 	fmt.Print("Enter your choice: ")
 
-	algorithm, _ := reader.ReadString('\n')
-	algorithm = strings.TrimSpace(algorithm)
+	algorithm := getInput(reader)
 
 	encoder := encoding.Build(algorithm)
 
@@ -85,21 +82,19 @@ func executeEncoding(reader *bufio.Reader) string {
 
 	fmt.Print("Enter source text: ")
 
-	text, _ := reader.ReadString('\n')
-	text = strings.TrimSpace(text)
+	text := getInput(reader)
 
 	fmt.Println("Do you want to:")
-	fmt.Println(encoding.ENCODE)
-	fmt.Println(encoding.DECODE)
+	fmt.Println(encoding.Encode)
+	fmt.Println(encoding.Decode)
 	fmt.Print("Enter your choice: ")
 
-	choice, _ := reader.ReadString('\n')
-	choice = strings.TrimSpace(choice)
+	choice := getInput(reader)
 
 	switch choice {
-	case encoding.ENCODE:
+	case encoding.Encode:
 		return encoder.Encode(text)
-	case encoding.DECODE:
+	case encoding.Decode:
 		return encoder.Decode(text)
 	default:
 		return "Undefined choice"
@@ -108,14 +103,13 @@ func executeEncoding(reader *bufio.Reader) string {
 
 func executeConverting(reader *bufio.Reader) string {
 	fmt.Println("Enter source numbering system: ")
-	fmt.Println(converting.DECIMAL)
-	fmt.Println(converting.BINARY)
-	fmt.Println(converting.OCTAL)
-	fmt.Println(converting.HEXADECIMAL)
+	fmt.Println(converting.Decimal)
+	fmt.Println(converting.Binary)
+	fmt.Println(converting.Octal)
+	fmt.Println(converting.Hexadecimal)
 	fmt.Print("Enter your choice: ")
 
-	initialNS, _ := reader.ReadString('\n')
-	initialNS = strings.TrimSpace(initialNS)
+	initialNS := getInput(reader)
 
 	converter := converting.Build(initialNS)
 
@@ -124,30 +118,40 @@ func executeConverting(reader *bufio.Reader) string {
 	}
 
 	fmt.Println("Enter target numbering system: ")
-	fmt.Println(converting.DECIMAL)
-	fmt.Println(converting.BINARY)
-	fmt.Println(converting.OCTAL)
-	fmt.Println(converting.HEXADECIMAL)
+	fmt.Println(converting.Decimal)
+	fmt.Println(converting.Binary)
+	fmt.Println(converting.Octal)
+	fmt.Println(converting.Hexadecimal)
 	fmt.Print("Enter your choice: ")
 
-	finalNS, _ := reader.ReadString('\n')
-	finalNS = strings.TrimSpace(finalNS)
+	finalNS := getInput(reader)
 
 	fmt.Print("Enter source value: ")
 
-	value, _ := reader.ReadString('\n')
-	value = strings.TrimSpace(value)
+	value := getInput(reader)
 
 	switch finalNS {
-	case converting.DECIMAL:
+	case converting.Decimal:
 		return converter.ConvertToDecimal(value)
-	case converting.BINARY:
+	case converting.Binary:
 		return converter.ConvertToBinary(value)
-	case converting.OCTAL:
+	case converting.Octal:
 		return converter.ConvertToOctal(value)
-	case converting.HEXADECIMAL:
+	case converting.Hexadecimal:
 		return converter.ConvertToHexadecimal(value)
 	default:
 		return "Undefined target numbering system"
 	}
+}
+
+func getInput(reader *bufio.Reader) string {
+	input, err := reader.ReadString('\n')
+
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	input = strings.TrimSpace(input)
+
+	return input
 }
