@@ -6,6 +6,7 @@ import (
 	"github.com/Ravgus/DevConverter/internal/converting"
 	"github.com/Ravgus/DevConverter/internal/encoding"
 	"github.com/Ravgus/DevConverter/internal/hashing"
+	"github.com/Ravgus/DevConverter/internal/text"
 	"log"
 	"os"
 	"strings"
@@ -14,6 +15,7 @@ import (
 const Hashing = "Hashing"
 const Encoding = "Encoding"
 const Converting = "Converting"
+const Text = "Text"
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
@@ -22,6 +24,7 @@ func main() {
 	fmt.Println(Hashing)
 	fmt.Println(Encoding)
 	fmt.Println(Converting)
+	fmt.Println(Text)
 	fmt.Print("Enter your choice: ")
 
 	purpose := getInput(reader)
@@ -35,6 +38,8 @@ func main() {
 		result = executeEncoding(reader)
 	case Converting:
 		result = executeConverting(reader)
+	case Text:
+		result = executeText(reader)
 	default:
 		fmt.Println("Undefined choice")
 
@@ -142,6 +147,28 @@ func executeConverting(reader *bufio.Reader) string {
 	default:
 		return "Undefined target numbering system"
 	}
+}
+
+func executeText(reader *bufio.Reader) string {
+	fmt.Println("Chose what do you want to do: ")
+	fmt.Println(text.Flip)
+	fmt.Println(text.UpperCase)
+	fmt.Println(text.LowerCase)
+	fmt.Print("Enter your choice: ")
+
+	action := getInput(reader)
+
+	processor := text.Build(action)
+
+	if processor == nil {
+		return "Undefined action"
+	}
+
+	fmt.Print("Enter source text: ")
+
+	text := getInput(reader)
+
+	return processor.Process(text)
 }
 
 func getInput(reader *bufio.Reader) string {
