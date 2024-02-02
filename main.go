@@ -3,182 +3,31 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/Ravgus/DevConverter/internal/converting"
-	"github.com/Ravgus/DevConverter/internal/encoding"
-	"github.com/Ravgus/DevConverter/internal/hashing"
-	"github.com/Ravgus/DevConverter/internal/text"
-	"log"
+	"github.com/Ravgus/DevConverter/internal"
+	"github.com/Ravgus/DevConverter/internal/helpers"
 	"os"
-	"strings"
 )
 
-const Hashing = "Hashing"
-const Encoding = "Encoding"
-const Converting = "Converting"
-const Text = "Text"
-
 func main() {
+	printChoseAction()
+
 	reader := bufio.NewReader(os.Stdin)
+	executer := internal.Build(helpers.GetInput(reader))
 
-	fmt.Println("Chose your action:")
-	fmt.Println(Hashing)
-	fmt.Println(Encoding)
-	fmt.Println(Converting)
-	fmt.Println(Text)
-	fmt.Print("Enter your choice: ")
-
-	purpose := getInput(reader)
-
-	var result string
-
-	switch purpose {
-	case Hashing:
-		result = executeHashing(reader)
-	case Encoding:
-		result = executeEncoding(reader)
-	case Converting:
-		result = executeConverting(reader)
-	case Text:
-		result = executeText(reader)
-	default:
-		fmt.Println("Undefined choice")
+	if executer == nil {
+		fmt.Println("Action is not implemented!")
 
 		return
 	}
 
-	fmt.Println("Result:", result)
+	fmt.Println("Result:", executer.Execute(reader))
 }
 
-func executeHashing(reader *bufio.Reader) string {
-	fmt.Println("Chose hash algorithm:")
-	fmt.Println(hashing.Md5)
-	fmt.Println(hashing.Sha1)
-	fmt.Println(hashing.Sha156)
-	fmt.Println(hashing.Sha512)
+func printChoseAction() {
+	fmt.Println("Chose your action:")
+	fmt.Println(internal.Hashing)
+	fmt.Println(internal.Encoding)
+	fmt.Println(internal.Converting)
+	fmt.Println(internal.Text)
 	fmt.Print("Enter your choice: ")
-
-	algorithm := getInput(reader)
-
-	hasher := hashing.Build(algorithm)
-
-	if hasher == nil {
-		return "Undefined hash algorithm"
-	}
-
-	fmt.Print("Enter source text: ")
-
-	text := getInput(reader)
-
-	return hasher.Hash(text)
-}
-
-func executeEncoding(reader *bufio.Reader) string {
-	fmt.Println("Chose encoding algorithm: ")
-	fmt.Println(encoding.Base64)
-	fmt.Print("Enter your choice: ")
-
-	algorithm := getInput(reader)
-
-	encoder := encoding.Build(algorithm)
-
-	if encoder == nil {
-		return "Undefined encoding algorithm"
-	}
-
-	fmt.Print("Enter source text: ")
-
-	text := getInput(reader)
-
-	fmt.Println("Do you want to:")
-	fmt.Println(encoding.Encode)
-	fmt.Println(encoding.Decode)
-	fmt.Print("Enter your choice: ")
-
-	choice := getInput(reader)
-
-	switch choice {
-	case encoding.Encode:
-		return encoder.Encode(text)
-	case encoding.Decode:
-		return encoder.Decode(text)
-	default:
-		return "Undefined choice"
-	}
-}
-
-func executeConverting(reader *bufio.Reader) string {
-	fmt.Println("Enter source numbering system: ")
-	fmt.Println(converting.Decimal)
-	fmt.Println(converting.Binary)
-	fmt.Println(converting.Octal)
-	fmt.Println(converting.Hexadecimal)
-	fmt.Print("Enter your choice: ")
-
-	initialNS := getInput(reader)
-
-	converter := converting.Build(initialNS)
-
-	if converter == nil {
-		return "Undefined numbering system"
-	}
-
-	fmt.Println("Enter target numbering system: ")
-	fmt.Println(converting.Decimal)
-	fmt.Println(converting.Binary)
-	fmt.Println(converting.Octal)
-	fmt.Println(converting.Hexadecimal)
-	fmt.Print("Enter your choice: ")
-
-	finalNS := getInput(reader)
-
-	fmt.Print("Enter source value: ")
-
-	value := getInput(reader)
-
-	switch finalNS {
-	case converting.Decimal:
-		return converter.ConvertToDecimal(value)
-	case converting.Binary:
-		return converter.ConvertToBinary(value)
-	case converting.Octal:
-		return converter.ConvertToOctal(value)
-	case converting.Hexadecimal:
-		return converter.ConvertToHexadecimal(value)
-	default:
-		return "Undefined target numbering system"
-	}
-}
-
-func executeText(reader *bufio.Reader) string {
-	fmt.Println("Chose what do you want to do: ")
-	fmt.Println(text.Flip)
-	fmt.Println(text.UpperCase)
-	fmt.Println(text.LowerCase)
-	fmt.Print("Enter your choice: ")
-
-	action := getInput(reader)
-
-	processor := text.Build(action)
-
-	if processor == nil {
-		return "Undefined action"
-	}
-
-	fmt.Print("Enter source text: ")
-
-	text := getInput(reader)
-
-	return processor.Process(text)
-}
-
-func getInput(reader *bufio.Reader) string {
-	input, err := reader.ReadString('\n')
-
-	if err != nil {
-		log.Fatalf("Error: %v", err)
-	}
-
-	input = strings.TrimSpace(input)
-
-	return input
 }
